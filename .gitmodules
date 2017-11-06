@@ -1,0 +1,3 @@
+[submodule "hw/enclosure/chamfers"]
+	path = hw/enclosure/chamfers
+	url = https://github.com/SebiTimeWaster/Chamfers-for-OpenSCAD.git
