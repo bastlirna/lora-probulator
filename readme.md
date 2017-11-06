@@ -1,12 +1,12 @@
 # LoRa Probulator
 
+<img src="https://raw.githubusercontent.com/bastlirna/lora-probulator/master/photo/front.jpg" height="200" alt="LoRa Probulator photo" align="right">
+
 *Yat Another LoRaWAN Tester*
 
 <img src="https://img.shields.io/badge/HW_status-in%20done-green.svg" alt="status: in progress"> <img src="https://img.shields.io/badge/FW_status-in%20progress-yellow.svg" alt="status: in progress">
 
-<p align="center">
-<img src="https://raw.githubusercontent.com/bastlirna/lora-probulator/master/photo/front.jpg" height="460" alt="LoRa Probulator photo">
-</p>
+<br>
 
 ## Motivation
 
