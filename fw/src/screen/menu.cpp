@@ -31,6 +31,7 @@ struct DeviceSettingsMenuItem : MenuItem {
 
     void apply() {
         lora_reset();
+        runtime.periodicReset();
     }
 };
 
@@ -86,6 +87,7 @@ struct ConfirmSettingsMenuItem : MenuItem {
     }
 
     void apply() {
+        runtime.periodicReset();
     }
 };
 
@@ -108,6 +110,7 @@ struct DownlinkSettingsMenuItem : MenuItem {
         }
     
         void apply() {
+            runtime.periodicReset();
         }
     };
 
