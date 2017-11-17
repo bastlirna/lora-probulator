@@ -12,7 +12,19 @@
 
 TBD
 
+
+## Key Features
+
+- Send LoRaWAN message on button press
+- Periodic sending
+- Configurable message parameters (confirmation, payload, SF, etc.)
+- Multiple device (ABP/OTAA, several keys configuration for testing several network providers)  
+
+For more detail about features see [Firmware project](https://github.com/bastlirna/lora-probulator/projects/1) where are list of all ideas, selected requirements and progress of its implementation.
+
 ## Build
+
+### Hardware
 
 What do you need:
 
@@ -22,12 +34,6 @@ What do you need:
 
 For more detail see [schematics](https://github.com/bastlirna/lora-probulator/blob/master/hw/lora-tester.pdf).
 
-## Key Features
+### Firmware
 
-- Send LoRaWAN message and button press [done]
-- Periodic sending
-- Change message parameters
-	- Confirmation [done]
-	- Payload format
-	- SF
-- Contain multiple device (ABP/OTAA, several keys configuration for testing several network providers)  
+FW is written in [Arduino libraries for ESP32](https://github.com/espressif/arduino-esp32) and build with [PlatformIO](http://platformio.org/). 
