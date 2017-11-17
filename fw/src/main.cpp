@@ -56,6 +56,11 @@ void loop() {
 
         delay(1500);
 
+        if (btnOff.update() && btnOff.fell()) {
+            // cancel sleep routine
+            return;
+        }
+
         //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33,1); //1 = High, 0 = Low
         esp_deep_sleep_enable_ext0_wakeup(GPIO_NUM_36, 0);
         
