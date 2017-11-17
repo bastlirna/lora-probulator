@@ -17,50 +17,40 @@
 
 #define BUTTON_PIN_BITMASK 0x200000000 // 2^33 in hex
 
-//RTC_DATA_ATTR int bootCount = 0;
-
-HomeScreen home = HomeScreen();
-MenuScreen menu = MenuScreen();
-AboutScreen about = AboutScreen();
-TxScreen txs = TxScreen();
-RxScreen rxs = RxScreen();
-MsgScreen msg = MsgScreen();
-
-ScreenMgr screenMgr = ScreenMgr();
-
-
-RTC_DATA_ATTR bool confirm = false;
-
-
 void setup() {
     Serial.begin(115200);
 
-    delay(100);
+    delay(10);
 
-    //++bootCount;
-    //Serial.println("Boot number: " + String(bootCount));
-  
     hal_setup();
     lcd_setup();
+    core_setup();
     lora_setup();
 
     screenMgr.change(&home);
 
-    Serial.println("Setup done!");
+    //Serial.println("Setup done!");
 }
+
+unsigned long prints;
 
 void loop() {
 
     hal_loop();
     lora_loop();
 
+    runtime.loop();
     screenMgr.loop();
 
     //delay(50);
 
     if (btnOff.update() && btnOff.rose()) {
 
-        Serial.println("Turn Off");
+        //Serial.println("Turn Off");
+
+        if (runtime.periodic) {
+            runtime.periodicStop();
+        }
 
         lcd_sleep();
 
@@ -75,7 +65,14 @@ void loop() {
         
         esp_deep_sleep_start();
 
-        Serial.println("Zzz...");
+        //Serial.println("Zzz...");
+    }
+
+
+    if (millis() - prints > 500) {
+        prints = millis();
+
+        display.dumpBuffer();
     }
 
 }

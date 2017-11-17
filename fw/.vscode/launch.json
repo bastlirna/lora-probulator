@@ -6,7 +6,7 @@
             "request": "launch",
             "cwd": "${workspaceRoot}",
             "name": "PlatformIO Debugger",
-            "target": "c:/Users/AdamHorcica/Dropbox/Pracovni/Dev/lora-probulator/fw/.pioenvs/lolin32/firmware.elf",
+            "target": "c:/Users/AdamHorcica/Dropbox/Pracovni/Dev/lora-probulator/fw/.pioenvs/loraprob/firmware.elf",
             "gdbpath": "C:/Users/AdamHorcica/.platformio/penv/Scripts/piodebuggdb",
             "autorun": [ "source .pioinit" ]
         }

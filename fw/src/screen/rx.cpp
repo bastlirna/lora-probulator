@@ -6,13 +6,13 @@
 #include <lmic.h>
 
 void RxScreen::enter() {
-    Serial.println("ENTER rx");
+    
 
     display.clear();
 
     display.setTextAlignment(TEXT_ALIGN_CENTER);
 
-    if (confirm) {
+    if (settings.confirm) {
         display.drawString(64, 0, "DONE (with confirm)");
     } else {
         display.drawString(64, 0, "DONE");
@@ -20,6 +20,9 @@ void RxScreen::enter() {
 
     if (LMIC.txrxFlags & TXRX_ACK) {
 
+        runtime.incrementStats(true);
+
+/*
         Serial.println(F("Received ack"));
         Serial.println();
         printf("RSSI: %d \n", LMIC.rssi);
@@ -29,9 +32,10 @@ void RxScreen::enter() {
         printf("globalDutyRate: %d \n", LMIC.globalDutyRate);
         printf("globalDutyAvail: %d \n", LMIC.globalDutyAvail);
         printf("datarate: %d \n", LMIC.datarate);
+        */
         ostime_t airtime = calcAirTime(LMIC.rps, LMIC.dataLen);
-        printf("Air time: %d.", airtime / 100);
-        printf("%d ms\n", airtime % 100);
+        //printf("Air time: %d.", airtime / 100);
+        //printf("%d ms\n", airtime % 100);
 
         display.setTextAlignment(TEXT_ALIGN_LEFT);
         display.drawString(0, 14, "Rx RSSI");
@@ -60,9 +64,16 @@ void RxScreen::enter() {
 
 
     } else if (LMIC.txrxFlags & TXRX_NACK) {
+
+        runtime.incrementStats(false);
+
         display.setTextAlignment(TEXT_ALIGN_LEFT);
         display.drawString(0, 14, "NACK");
+
     } else {
+
+        runtime.incrementStats(false);
+
         display.setTextAlignment(TEXT_ALIGN_LEFT);
         display.drawString(0, 14, "NO ACK");
     }
@@ -105,10 +116,27 @@ void RxScreen::enter() {
 }
 
 void RxScreen::leave() {
-    Serial.println("LEAVE rx");
+    
 }
 
 void RxScreen::loop() {
+    if (autoClose) {
+        long diff = 3000 - (millis() - enterTime);
+
+        if (diff <= 0) {
+            onBPress();
+        } else {
+            int t = round(diff / 1000);
+
+            display.setColor(BLACK);
+            display.fillRect(0, 53, 128, 12);
+            display.setColor(WHITE);
+
+            display.setTextAlignment(TEXT_ALIGN_RIGHT);
+            display.drawString(127, 52, "OK (" + String(t + 1) + ")");
+            display.display();
+        }
+    }
 }
 
 void RxScreen::onAPress() {
@@ -116,5 +144,10 @@ void RxScreen::onAPress() {
 }
 
 void RxScreen::onBPress() {
+
+    if (runtime.periodic) {
+        runtime.periodicContinue();
+    }
+
     screenMgr.change(&home);
 }

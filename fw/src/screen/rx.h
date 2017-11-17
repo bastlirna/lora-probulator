@@ -12,6 +12,8 @@ public:
 
     void onAPress();
     void onBPress();
+
+    bool autoClose;
 };
 
 

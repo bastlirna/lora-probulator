@@ -12,6 +12,7 @@ public:
 
     virtual void onAPress();
     virtual void onBPress();
+    virtual void onBLongPress();
 };
 
 

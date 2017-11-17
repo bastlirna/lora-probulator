@@ -5,22 +5,51 @@
 #include "core.h"
 
 void HomeScreen::enter() {
-    Serial.println("ENTER home");
+    
 
     lcd_home();
+
+    display.dumpBuffer();
 }
 
 void HomeScreen::leave() {
-    Serial.println("LEAVE home");
+    
 }
 
 void HomeScreen::loop() {
+    lcd_home();
+ 
+    if (runtime.periodicRunning && runtime.send) {
+        screenMgr.change(&txs);
+    }
 }
 
 void HomeScreen::onAPress() {
+
+    if (runtime.periodic) {
+        runtime.periodicStop();
+    }
+
     screenMgr.change(&menu);
 }
 
 void HomeScreen::onBPress() {
-    screenMgr.change(&txs);
+
+    if (runtime.periodic) {
+        if (runtime.periodicRunning) {
+            runtime.periodicStop();
+        } else {
+            runtime.periodicStart();
+        }
+    } else {
+        screenMgr.change(&txs);
+    }
+
+}
+
+void HomeScreen::onBLongPress() {
+    if (runtime.periodic) {
+        runtime.periodicStop();
+        runtime.periodicReset();
+    }
 }

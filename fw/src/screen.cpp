@@ -33,6 +33,7 @@ void ScreenMgr::loop() {
 
         _current = _nextScreen;
         changePanding = false;
+        _current->enterTime = millis();
         _current->enter();
     }
 

@@ -19,20 +19,17 @@ void do_send(osjob_t* j);
 
 // provide application router ID (8 bytes, LSBF)
 void os_getArtEui (u1_t* buf) {
-    memcpy(buf, APPEUI, 8);
+    memcpy(buf, lora_dev[settings.currentDev].APPEUI, 8);
 }
 
 // provide device ID (8 bytes, LSBF)
 void os_getDevEui (u1_t* buf) {
-    memcpy(buf, DEVEUI, 8);
+    memcpy(buf, lora_dev[settings.currentDev].DEVEUI, 8);
 }
-
-static const u1_t PROGMEM APPKEY[16] = { 0xB4, 0xD0, 0x4F, 0x2B, 0x8D, 0x2A, 0xA6, 0xEB, 0x53, 0xAF, 0x5A, 0x19, 0x3C, 0x06, 0xF9, 0x33 };
-
 
 // provide device key (16 bytes)
 void os_getDevKey (u1_t* buf) {
-    memcpy(buf, APPKEY, 16);
+    memcpy(buf, lora_dev[settings.currentDev].APPKEY, 16);
 }
 
 //uint8_t mydata[] = "Hello ESP8266 world!";
@@ -58,47 +55,56 @@ void onEvent(ev_t ev) {
 
   switch (ev) {
   case EV_SCAN_TIMEOUT:
-    Serial.println(F("EV_SCAN_TIMEOUT"));
+    //Serial.println(F("EV_SCAN_TIMEOUT"));
     break;
   case EV_BEACON_FOUND:
-    Serial.println(F("EV_BEACON_FOUND"));
+    //Serial.println(F("EV_BEACON_FOUND"));
     break;
   case EV_BEACON_MISSED:
-    Serial.println(F("EV_BEACON_MISSED"));
+    //Serial.println(F("EV_BEACON_MISSED"));
     break;
   case EV_BEACON_TRACKED:
-    Serial.println(F("EV_BEACON_TRACKED"));
+    //Serial.println(F("EV_BEACON_TRACKED"));
     break;
   case EV_JOINING:
-    Serial.println(F("EV_JOINING"));
+    //Serial.println(F("EV_JOINING"));
     break;
   case EV_JOINED:
-    Serial.println(F("EV_JOINED"));
+    //Serial.println(F("EV_JOINED"));
 
     // Disable link check validation (automatically enabled
     // during join, but not supported by TTN at this time).
   //  LMIC_setLinkCheckMode(0);
     break;
   case EV_RFU1:
-    Serial.println(F("EV_RFU1"));
+    //Serial.println(F("EV_RFU1"));
     break;
   case EV_JOIN_FAILED:
-    Serial.println(F("EV_JOIN_FAILED"));
+    //Serial.println(F("EV_JOIN_FAILED"));
     break;
   case EV_REJOIN_FAILED:
-    Serial.println(F("EV_REJOIN_FAILED"));
+    //Serial.println(F("EV_REJOIN_FAILED"));
     break;
     break;
   case EV_TXCOMPLETE:
-    Serial.println(F("EV_TXCOMPLETE (includes waiting for RX windows)"));
+      //Serial.println(F("EV_TXCOMPLETE (includes waiting for RX windows)"));
 
-      screenMgr.change(&rxs);
+      if (settings.confirm || settings.donwlink) {
+        screenMgr.change(&rxs); 
+      } else {
+
+        if (runtime.periodic) {
+          runtime.periodicContinue();
+          runtime.incrementStats(false);
+        }
+        screenMgr.change(&home);
+      }
 
     /*
     if (LMIC.txrxFlags & TXRX_ACK) {
       
-      Serial.println(F("Received ack"));
-      Serial.println();
+      //Serial.println(F("Received ack"));
+      //Serial.println();
       printf("RSSI: %d \n", LMIC.rssi);
       printf("SNR: %d \n", LMIC.snr);
       printf("Freq: %d \n", LMIC.freq);
@@ -114,9 +120,9 @@ void onEvent(ev_t ev) {
 
     if (LMIC.dataLen) {
       // data received in rx slot after tx
-      Serial.print(F("Received "));
-      Serial.print(LMIC.dataLen);
-      Serial.print(F(" bytes of payload: 0x"));
+      //Serial.print(F("Received "));
+      //Serial.print(LMIC.dataLen);
+      //Serial.print(F(" bytes of payload: 0x"));
       for (int i = 0; i < 50; i++)
       {
         digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
@@ -129,17 +135,17 @@ void onEvent(ev_t ev) {
       {
         if (LMIC.frame[LMIC.dataBeg + i] < 0x10) 
         {
-          Serial.print(F("0"));
+          //Serial.print(F("0"));
         }
-        Serial.print(LMIC.frame[LMIC.dataBeg + i], HEX);
+        //Serial.print(LMIC.frame[LMIC.dataBeg + i], HEX);
       }
       
 
-      Serial.println();
+      //Serial.println();
     }
     else
     {
-     Serial.print(F("No data received "));
+     //Serial.print(F("No data received "));
     }
     */
      // Schedule next transmission
@@ -149,42 +155,42 @@ void onEvent(ev_t ev) {
 
     break;
   case EV_LOST_TSYNC:
-    Serial.println(F("EV_LOST_TSYNC"));
+    //Serial.println(F("EV_LOST_TSYNC"));
     break;
   case EV_RESET:
-    Serial.println(F("EV_RESET"));
+    //Serial.println(F("EV_RESET"));
     break;
   case EV_RXCOMPLETE:
     // data received in ping slot
-    Serial.println(F("EV_RXCOMPLETE"));
+    //Serial.println(F("EV_RXCOMPLETE"));
     break;
   case EV_LINK_DEAD:
-    Serial.println(F("EV_LINK_DEAD"));
+    //Serial.println(F("EV_LINK_DEAD"));
     break;
   case EV_LINK_ALIVE:
-    Serial.println(F("EV_LINK_ALIVE"));
+    //Serial.println(F("EV_LINK_ALIVE"));
     break;
   default:
-    Serial.println(F("Unknown event"));
+    //Serial.println(F("Unknown event"));
     break;
   }
 }
 
 void do_send(osjob_t* j){
-      Serial.print("Time: ");
-      Serial.println(millis() / 1000);
+      //Serial.print("Time: ");
+      //Serial.println(millis() / 1000);
       // Show TX channel (channel numbers are local to LMIC)
-      Serial.print("Send, txCnhl: ");
-      Serial.println(LMIC.txChnl);
-      Serial.print("Opmode check: ");
+      //Serial.print("Send, txCnhl: ");
+      //Serial.println(LMIC.txChnl);
+      //Serial.print("Opmode check: ");
       // Check if there is not a current TX/RX job running
     if (LMIC.opmode & (1 << 7)) 
     {
-      Serial.println("OP_TXRXPEND, not sending");
+      //Serial.println("OP_TXRXPEND, not sending");
     } 
     else 
     {
-      Serial.println("ok");
+      //Serial.println("ok");
       // Prepare upstream data transmission at the next possible time.
       //LMIC_setTxData2(1, mydata, sizeof(mydata)-1, 1);
     }
@@ -203,7 +209,7 @@ void lora_setup() {
 
     lora_reset();
 
-    Serial.println("os_init() finished");
+    //Serial.println("os_init() finished");
     
     
 
@@ -214,38 +220,52 @@ void lora_setup() {
 void lora_reset() {
     // Reset the MAC state. Session and pending data transfers will be discarded.
     LMIC_reset();
-    Serial.println("LMIC_reet() finished");
+    //Serial.println("LMIC_reet() finished");
 
     // Set static session parameters. Instead of dynamically establishing a session 
     // by joining the network, precomputed session parameters are be provided.
-    LMIC_setSession (0x1, DEVADDR, (uint8_t*)NWKSKEY, (uint8_t*)APPSKEY);
-    Serial.println("LMIC_setSession() finished");
+    LMIC_setSession (0x1, lora_dev[settings.currentDev].DEVADDR, (uint8_t*)lora_dev[settings.currentDev].NWKSKEY, (uint8_t*)lora_dev[settings.currentDev].APPSKEY);
+    //Serial.println("LMIC_setSession() finished");
+
+    // LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);      // g-band
+    // LMIC_setupChannel(1, 868300000, DR_RANGE_MAP(DR_SF12, DR_SF7B), BAND_CENTI);      // g-band
+    // LMIC_setupChannel(2, 868500000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);      // g-band
+    // LMIC_setupChannel(3, 867100000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);      // g-band
+    // LMIC_setupChannel(4, 867300000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);      // g-band
+    // LMIC_setupChannel(5, 867500000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);      // g-band
+    // LMIC_setupChannel(6, 867700000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);      // g-band
+    // LMIC_setupChannel(7, 867900000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);      // g-band
+    // LMIC_setupChannel(8, 868800000, DR_RANGE_MAP(DR_FSK, DR_FSK), BAND_MILLI);      // g2-band
 
     // Disable data rate adaptation
-    // LMIC_setAdrMode(0);
-    Serial.println("LMICsetAddrMode() finished");
+    //LMIC_setAdrMode(0);
+    LMIC.adrEnabled = 0;
+    //Serial.println("LMICsetAddrMode() finished");
 
     // Disable link check validation
     LMIC_setLinkCheckMode(0);
     // Disable beacon tracking
-    //LMIC_disableTracking ();
+    LMIC_disableTracking ();
     // Stop listening for downstream data (periodical reception)
-    //LMIC_stopPingable();
+    LMIC_stopPingable();
       // Disable link check validation
-    // TTN uses SF12 for its RX2 window.
-    LMIC.dn2Dr = DR_SF12;
+    
+    LMIC.dn2Dr = DR_SF9;
 
     // Set data rate and transmit power (note: txpow seems to be ignored by the library)
     LMIC_setDrTxpow(DR_SF7, 14);
+
+    //lora_change_sf(sf);
+
     //
-    //Serial.flush();
-    Serial.println("Init done");
+    ////Serial.flush();
+    //Serial.println("Init done");
 }
 
 void saveParam(u4_t value, char *name)
 {
 //   if(strcmp(name, "seqnoUp") == 0){
-//       Serial.println("updating seq");
+////       Serial.println("updating seq");
 //       EEPROM.put(0, value);
 //       EEPROM.commit();
 //   }
@@ -259,3 +279,48 @@ void lora_loop() {
 void lora_off() {
     LMIC_shutdown();
 }
+
+void lora_change_sf(uint8_t s) {
+
+  LMIC_setDrTxpow(SF7, 14); 
+
+  return;
+
+  //Serial.print("Set SF to ");
+  //Serial.println(s);
+
+    switch(s) {
+        case 7:
+          //Serial.println("7");
+          LMIC_setDrTxpow(SF7, 14); 
+          return;
+        case 8:
+          //Serial.println("8");
+          LMIC_setDrTxpow(SF8, 14); 
+          return;
+        case 9:
+          //Serial.println("9");
+          LMIC_setDrTxpow(SF9, 14); 
+          return;
+        case 10:
+          //Serial.println("10");
+          LMIC_setDrTxpow(SF10, 14); 
+          return;
+        case 11:
+          //Serial.println("11");
+          LMIC_setDrTxpow(SF11, 14); 
+          return;
+        case 12:
+          //Serial.println("12");
+          LMIC_setDrTxpow(SF12, 14); 
+          return;
+        defualt:
+          Serial.println("UNKNOWN SF");
+  }
+
+}
+
+const char * lora_dev_name(uint8_t id) {
+    return lora_dev[id].name;
+}
+

@@ -18,6 +18,6 @@ void lcd_sleep();
 
 void lcd_txs();
 
-void lcd_menu_item(unsigned int pos, const char * label, const char * value, bool selected);
+void lcd_menu_item(unsigned int pos, const char * label, String value, bool selected);
 
 #endif

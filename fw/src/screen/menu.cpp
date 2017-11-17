@@ -3,69 +3,188 @@
 #include "core.h"
 #include "hal.h"
 #include "lcd.h"
+#include "lora.h"
 
 // --- Menu Items -------------------------------------------------------------
 
+struct DeviceSettingsMenuItem : MenuItem {
+    
+    const char * label() {
+        return "Device";
+    }
+
+    String value() {
+        return lora_dev_name(settings.currentDev);
+    }
+
+    void change() {
+        settings.currentDev ++;
+
+        if (settings.currentDev >= 3) {
+            settings.currentDev = 0;
+        }
+    }
+
+    void reset() {
+        settings.currentDev = 0;
+    }
+
+    void apply() {
+        lora_reset();
+    }
+};
+
 struct PayloadSettingsMenuItem : MenuItem {
-    
-        bool state = false;
-    
-        const char * label() {
-            return "Payload";
+
+    const char * label() {
+        return "Payload";
+    }
+
+    String value() {
+        switch (settings.payloadType) {
+            case PayloadEmpty:
+                return "Empty";
+            case PayloadTxt:
+                return "TXT";
+            case PayloadCounter:
+                return "CTN";
+            default:
+                return "";
         }
-    
-        const char * value() {
-            return state ? "[EMPTY]" : "[LIPSUM]";
-        }
-    
-        void change() {
-            state = !state;
-        }
-    };
+    }
+
+    void change() {
+        int e = (int)settings.payloadType;
+        
+        settings.payloadType = (PayloadType)e;
+    }
+
+    void reset() {
+        settings.payloadType = PayloadEmpty;
+    }
+
+    void apply() {
+    }
+};
 
 struct ConfirmSettingsMenuItem : MenuItem {
 
     const char * label() {
-        return "Confirm msg.";
+        return "Confirmation";
     }
 
-    const char * value() {
-        return confirm ? "[Yes]" : "[No]";
+    String value() {
+        return settings.confirm ? "YES" : "NO";
     }
 
     void change() {
-        confirm = !confirm;
+        settings.confirm = !settings.confirm;
+    }
+
+    void reset() {
+        settings.confirm = false;
+    }
+
+    void apply() {
     }
 };
 
-struct PeriodSettingsMenuItem : MenuItem {
-    
-        bool state = false;
+struct DownlinkSettingsMenuItem : MenuItem {
     
         const char * label() {
-            return "Periodic";
+            return "Downlink";
         }
     
-        const char * value() {
-            return state ? "[Yes]" : "[No]";
+        String value() {
+            return settings.donwlink ? "YES" : "NO";
         }
     
         void change() {
-            state = !state;
+            settings.donwlink = !settings.donwlink;
+        }
+
+        void reset() {
+            settings.donwlink = false;
+        }
+    
+        void apply() {
         }
     };
+
+struct PeriodicSettingsMenuItem : MenuItem {
+
+    const char * label() {
+        return "Periodic";
+    }
+
+    String value() {
+
+        if (settings.interval == -1) {
+            return "OFF";
+        }
+
+        return String(INTERVALS[settings.interval]);
+    }
+
+    void change() {
+        settings.interval ++;
+        if (settings.interval >= INTERVALS_LEN) settings.interval = -1;
+    }
+
+    void reset() {
+        settings.interval = -1;
+    }
+
+    void apply() {
+        if (settings.interval == -1) {
+            runtime.periodic = false;
+        } else {
+            runtime.periodic = true;
+        }
+    }
+};
+
+struct SFSettingsMenuItem : MenuItem {
+
+    const char * label() {
+        return "Spreading factor";
+    }
+
+    String value() {
+        return "SF" + String(settings.sf, 10);
+    }
+
+    void change() {
+        settings.sf ++;
+        if (settings.sf > 12) settings.sf = 7;
+    }
+
+    void reset() {
+        settings.sf = 7;
+    }
+
+    void apply() {
+        lora_change_sf(settings.sf);
+    }
+};
 
 struct AboutMenuItem : MenuItem {
     const char * label() {
         return "About";
     };
 
-    const char * value() {
+    String value() {
         return ">";
     };
 
     void change() {
         screenMgr.change(&about);
+    }
+
+    void reset() {
+    }
+
+    void apply() {
     }
 };
 
@@ -74,12 +193,18 @@ struct ExitMenuItem : MenuItem {
         return "Exit";
     };
 
-    const char * value() {
+    String value() {
         return ">";
     };
 
     void change() {
         screenMgr.change(&home);
+    }
+
+    void reset() {
+    }
+
+    void apply() {
     }
 };
 
@@ -88,31 +213,33 @@ struct ExitMenuItem : MenuItem {
 
 MenuScreen::MenuScreen() {
 
-    items[0] = new ConfirmSettingsMenuItem();
-    //items[1] = new PeriodSettingsMenuItem();
-    //items[2] = new PayloadSettingsMenuItem();
+    byte i = 0;
+
+    items[i++] = new DeviceSettingsMenuItem();
+    items[i++] = new PeriodicSettingsMenuItem();
+    items[i++] = new ConfirmSettingsMenuItem();
+    items[i++] = new DownlinkSettingsMenuItem();
+    items[i++] = new SFSettingsMenuItem();
+    items[i++] = new PayloadSettingsMenuItem();
     
-    items[1] = new AboutMenuItem();
-    items[2] = new ExitMenuItem();
+    items[i++] = new AboutMenuItem();
+    items[i++] = new ExitMenuItem();
     
-
-    /*items[2] = new MenuItem("Exit2");
-    items[3] = new MenuItem("Exit3");
-    items[4] = new MenuItem("Exit4");
-    items[5] = new MenuItem("Exit5");
-    */
-
-    len = 3;
-
+    len = i;
 }
 
 void MenuScreen::enter() {
     current = 0;
+    itemChanged = false;
     update();
 }
 
 void MenuScreen::leave() {
-    Serial.println("LEAVE Menu");
+    if (itemChanged) {
+        items[current]->apply();
+    }
+
+    
 }
 
 void MenuScreen::update() {
@@ -124,19 +251,10 @@ void MenuScreen::update() {
         start = current - 3;
     }
 
-    Serial.print("---");
-    Serial.print(start);
-    Serial.println("---");
-
     for(int i = start; i < len && i < start + 4; i++) {
-
-        Serial.print(i == current ? "> " : "  ");
-        Serial.println(i);
-
+        
         lcd_menu_item(i-start, items[i]->label(), items[i]->value(), i == current);
     }
-
-    Serial.println("---");
 
     lcd_update();
 }
@@ -146,7 +264,13 @@ void MenuScreen::loop() {
 
 // Next menu item
 void MenuScreen::onAPress() {
+
+    if (itemChanged) {
+        items[current]->apply();
+    }
+
     current ++;
+    itemChanged = false;
 
     if (current >= len) {
         current = 0;
@@ -155,15 +279,24 @@ void MenuScreen::onAPress() {
     update();
 }
 
-// CHange value
-void MenuScreen::onBPress() {
-    items[current]->change();
-    update();
-}
-
 void MenuScreen::onALongPress() {
     screenMgr.change(&home);
 }
+
+// CHange value
+void MenuScreen::onBPress() {
+    items[current]->change();
+    itemChanged = true;
+    update();
+}
+
+// CHange value
+void MenuScreen::onBLongPress() {
+    items[current]->reset();
+    itemChanged = true;
+    update();
+}
+
 
 /*MenuItem::MenuItem(const char *label) {
     this->label = label;

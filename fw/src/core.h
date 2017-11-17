@@ -20,6 +20,54 @@ extern ScreenMgr screenMgr;
 
 extern Screen* currentScree;
 
-extern bool confirm;
+extern int INTERVALS[];
+
+#define INTERVALS_LEN 6
+
+enum PayloadType {
+    PayloadEmpty = 0,
+    PayloadTxt,
+    PayloadCounter
+};
+
+struct Settings {
+    bool saved;
+    bool confirm;
+    bool donwlink;
+    PayloadType payloadType;
+    uint8_t sf;
+    uint8_t currentDev;
+    int16_t interval;
+};
+
+struct Runtime {
+    bool periodic;
+    bool periodicRunning;
+    bool send;
+
+    unsigned long interval;
+    unsigned long lastRun;
+
+    void loop();
+
+    void periodicStart();
+    void periodicStop();
+    void periodicReset();
+    void periodicContinue();
+
+    void incrementStats(bool success);
+
+    long countdownTime();
+
+    unsigned int counter;
+    unsigned int successCounter;
+    unsigned int errorCounter;
+    unsigned int successRate;
+};
+
+extern Settings settings;
+extern Runtime runtime;
+
+void core_setup();
 
 #endif

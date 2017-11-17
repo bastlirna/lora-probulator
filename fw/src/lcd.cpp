@@ -1,6 +1,15 @@
 #include "lcd.h"
 
+#include "lora.h"
+#include "core.h"
+
+#include "imgs/icons.h"
+
+#define ICON(name) name##_width, name##_height, name##_bits 
+
 SSD1306 display(0x3c, 21, 22);
+
+
 
 void lcd_setup() {
     display.init();
@@ -12,11 +21,95 @@ void lcd_setup() {
 void lcd_home() {
     display.clear();
 
-    lcd_menu_bar("MENU", "SEND");
+    const char * action;
 
-    display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 20, "LoRaWAN Tester");
+    if (runtime.periodic) {
+        if (runtime.periodicRunning) {
+            action = "STOP";
+        } else {
+            action = "START";
+        }
+    } else {
+        action = "SEND";
+    }
 
+    lcd_menu_bar("MENU", action);
+
+    // device 
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.drawString(0, 0, lora_dev_name(settings.currentDev));
+
+    byte next_icon = 118;
+
+    // confirm
+    if (settings.confirm) {
+        display.drawXbm(next_icon, 1, ICON(ack));
+        next_icon -= 11;
+    }
+
+    // up/down icon
+    if (settings.donwlink) {
+        display.drawXbm(next_icon, 1, ICON(downlink));
+    } else {
+        display.drawXbm(next_icon, 1, ICON(uplink));
+    }
+    
+    // interval
+    if (runtime.periodic) {
+        display.setTextAlignment(TEXT_ALIGN_CENTER);    
+        display.drawString(0, 64, String(INTERVALS[settings.interval]) + "s");
+    }
+
+    display.drawHorizontalLine(0, 12, 128);
+
+    if (runtime.periodic) {
+
+        const int top = 37;            
+        const int len = 92;
+
+        if (runtime.periodicRunning) {
+
+            display.setTextAlignment(TEXT_ALIGN_RIGHT);
+            display.drawString(126, top - 1, String(round(runtime.countdownTime()/1000) + 1) + " s");
+
+            display.drawRect(2, top + 2, len, 7);
+            display.fillRect(4, top + 4, round((len - 3) * runtime.countdownTime() / runtime.interval), 3);
+
+        } else {
+            display.setTextAlignment(TEXT_ALIGN_CENTER);
+            display.drawString(64, top - 1, "Ready");
+        }
+
+        if (settings.confirm) {
+
+            if (runtime.counter == 0) {
+                display.setTextAlignment(TEXT_ALIGN_LEFT);
+                display.drawString(1, 19, "Stats:");
+                
+                display.setTextAlignment(TEXT_ALIGN_RIGHT);
+                display.drawString(126, 19, "-");
+            } else {
+                display.setTextAlignment(TEXT_ALIGN_LEFT);
+                display.drawString(1, 19, "Stats:");
+            
+                display.setTextAlignment(TEXT_ALIGN_RIGHT);
+                display.drawString(126, 19, String(runtime.successCounter) + "/" + String(runtime.counter) + " (" + String(runtime.successRate) + " %)");
+            }
+
+        } else {
+            display.setTextAlignment(TEXT_ALIGN_LEFT);
+            display.drawString(1, 19, "Counter:");
+            
+            display.setTextAlignment(TEXT_ALIGN_RIGHT);
+            display.drawString(126, 19, String(runtime.counter));
+        }
+        
+    } else {
+
+        display.setTextAlignment(TEXT_ALIGN_CENTER_BOTH);
+        display.drawString(64, 32, "Ready");
+    }
+     
     display.display();
 }
 
@@ -51,10 +144,7 @@ void lcd_menu_bar(const char* a, const char* b) {
     display.drawString(127, 52, b);
 }
 
-void lcd_menu_item(unsigned int pos, const char * label, const char * value, bool selected) {
-
-    Serial.print(pos);
-    Serial.println("label");
+void lcd_menu_item(unsigned int pos, const char * label, String value, bool selected) {
 
     display.setTextAlignment(TEXT_ALIGN_LEFT);
 
@@ -66,7 +156,6 @@ void lcd_menu_item(unsigned int pos, const char * label, const char * value, boo
 
     display.setTextAlignment(TEXT_ALIGN_RIGHT);
     display.drawString(127, pos * 12, value);
-
 }
 
 void lcd_sleep() {

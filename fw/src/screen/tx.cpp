@@ -6,17 +6,17 @@
 #include "core.h"
 #include "lora.h"
 
-uint8_t mydata[] = "Hello world!";
+uint8_t mydata[] = "X";
 
 void TxScreen::enter() {
-    Serial.println("ENTER tx");
+    
 
     lcd_txs();
-
+/*
     Serial.print("Send, txCnhl: ");
     Serial.println(LMIC.txChnl);
     Serial.print("Opmode check: ");
-
+*/
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.drawString(0, 12, "Tx Chnl");
 
@@ -34,7 +34,7 @@ void TxScreen::enter() {
     display.drawString(0, 24, "Confirm");
 
     display.setTextAlignment(TEXT_ALIGN_RIGHT);
-    display.drawString(60, 24, confirm ? "YES" : "NO");
+    display.drawString(60, 24, settings.confirm ? "YES" : "NO");
 
     display.display();
 
@@ -42,30 +42,35 @@ void TxScreen::enter() {
     if (LMIC.opmode & (1 << 7)) 
     {
         msg.message = "OP_TXRXPEND, not sending";
-        Serial.println("OP_TXRXPEND, not sending");
+        //Serial.println("OP_TXRXPEND, not sending");
 
         screenMgr.change(&msg);
     } 
     else 
     {
-        Serial.println("ok");
+        //Serial.println("ok");
 
         LMIC.upRepeat = 1;
 
         // Prepare upstream data transmission at the next possible time.
-        LMIC_setTxData2(confirm ? 2 : 1, mydata, sizeof(mydata)-1, confirm ? 1 : 0);
+        LMIC_setTxData2(settings.donwlink ? 2 : 1, mydata, sizeof(mydata)-1, settings.confirm ? 1 : 0);
     }
 
 }
 
 void TxScreen::leave() {
-    Serial.println("LEAVE tx");
+    //Serial.println("LEAVE tx");
 }
 
 void TxScreen::loop() {
 }
 
 void TxScreen::onAPress() {
+    
+    if (runtime.periodic) {
+        runtime.periodicStop();
+    }
+
     lora_reset();
     screenMgr.change(&home);
 }

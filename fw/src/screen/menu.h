@@ -2,11 +2,14 @@
 #define _menuscreen_h_
 
 #include <screen.h>
+#include <Arduino.h>
 
 struct MenuItem {
     virtual const char * label();
-    virtual const char * value();
+    virtual String value();
     virtual void change();
+    virtual void reset();
+    virtual void apply();
 };
 
 class MenuScreen : public Screen {
@@ -22,13 +25,15 @@ public:
     virtual void onAPress();
     virtual void onALongPress();
     virtual void onBPress();
+    virtual void onBLongPress();
 
 private:
     void update();
 
     MenuItem* items[10];
     int len;
-    int current=0;
+    int current = 0;
+    bool itemChanged = false;
 
 };
 

@@ -5,7 +5,7 @@
 #include "core.h"
 
 void MsgScreen::enter() {
-    Serial.println("ENTER home");
+    
 
     display.clear();
 
