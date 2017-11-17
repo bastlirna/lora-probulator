@@ -5,15 +5,10 @@
 #include "core.h"
 
 void HomeScreen::enter() {
-    
-
     lcd_home();
-
-    display.dumpBuffer();
 }
 
 void HomeScreen::leave() {
-    
 }
 
 void HomeScreen::loop() {

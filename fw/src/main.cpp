@@ -22,6 +22,7 @@ void setup() {
 
     delay(10);
 
+    log_setup();
     hal_setup();
     lcd_setup();
     core_setup();
@@ -29,7 +30,7 @@ void setup() {
 
     screenMgr.change(&home);
 
-    //Serial.println("Setup done!");
+    Log.trace("Setup done!");
 }
 
 unsigned long prints;
@@ -42,11 +43,9 @@ void loop() {
     runtime.loop();
     screenMgr.loop();
 
-    //delay(50);
-
     if (btnOff.update() && btnOff.rose()) {
 
-        //Serial.println("Turn Off");
+        Log.trace("Sleep request detected");
 
         if (runtime.periodic) {
             runtime.periodicStop();
@@ -61,23 +60,24 @@ void loop() {
             return;
         }
 
+        Log.trace("Going to sleep");
+
         //esp_sleep_enable_ext0_wakeup(GPIO_NUM_33,1); //1 = High, 0 = Low
         esp_deep_sleep_enable_ext0_wakeup(GPIO_NUM_36, 0);
-        
-        //Go to sleep now
+
         display.displayOff();
         lora_off();
-        
         esp_deep_sleep_start();
 
-        //Serial.println("Zzz...");
+        // this will newer called
+        while(1);
     }
 
-
+    /*
     if (millis() - prints > 500) {
         prints = millis();
 
         display.dumpBuffer();
-    }
+    }*/
 
 }

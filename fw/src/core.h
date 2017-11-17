@@ -1,6 +1,8 @@
 #ifndef _core_h_
 #define _core_h_
 
+#include <log.h>
+
 #include <screen.h>
 #include <screen/home.h>
 #include <screen/menu.h>

@@ -22,7 +22,7 @@ void RxScreen::enter() {
 
         runtime.incrementStats(true);
 
-/*
+        /*
         Serial.println(F("Received ack"));
         Serial.println();
         printf("RSSI: %d \n", LMIC.rssi);
@@ -33,6 +33,7 @@ void RxScreen::enter() {
         printf("globalDutyAvail: %d \n", LMIC.globalDutyAvail);
         printf("datarate: %d \n", LMIC.datarate);
         */
+        
         ostime_t airtime = calcAirTime(LMIC.rps, LMIC.dataLen);
         //printf("Air time: %d.", airtime / 100);
         //printf("%d ms\n", airtime % 100);
