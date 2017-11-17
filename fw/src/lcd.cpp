@@ -7,7 +7,7 @@
 
 #define ICON(name) name##_width, name##_height, name##_bits 
 
-SSD1306 display(0x3c, 21, 22);
+Display display(0x3c, 21, 22);
 
 
 

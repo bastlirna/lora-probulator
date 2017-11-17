@@ -33,7 +33,7 @@ void setup() {
     Log.trace("Setup done!");
 }
 
-unsigned long prints;
+unsigned long screenMirrorTime;
 
 void loop() {
 
@@ -73,11 +73,10 @@ void loop() {
         while(1);
     }
 
-    /*
-    if (millis() - prints > 500) {
-        prints = millis();
-
-        display.dumpBuffer();
-    }*/
-
+    if (settings.screenMirror) {
+        if (millis() - screenMirrorTime > 500) {
+            screenMirrorTime = millis();
+            display.sendBufferOnSerial();
+        }
+    }
 }

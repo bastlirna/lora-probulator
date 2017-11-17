@@ -2,8 +2,9 @@
 #define _lcd_h_
 
 #include "SSD1306.h"
+#include "Display.h"
 
-extern SSD1306 display;
+extern Display display;
 
 void lcd_setup();
 void lcd_update();

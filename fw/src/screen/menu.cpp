@@ -171,6 +171,28 @@ struct SFSettingsMenuItem : MenuItem {
     }
 };
 
+struct ScreenMirrorMenuItem : MenuItem {
+
+    const char * label() {
+        return "Screen mirror";
+    }
+
+    String value() {
+        return settings.screenMirror ? "YES" : "NO";
+    }
+
+    void change() {
+        settings.screenMirror = !settings.screenMirror;
+    }
+
+    void reset() {
+        settings.screenMirror = false;
+    }
+
+    void apply() {
+    }
+};
+
 struct AboutMenuItem : MenuItem {
     const char * label() {
         return "About";
@@ -225,6 +247,7 @@ MenuScreen::MenuScreen() {
     items[i++] = new SFSettingsMenuItem();
     items[i++] = new PayloadSettingsMenuItem();
     
+    items[i++] = new ScreenMirrorMenuItem();
     items[i++] = new AboutMenuItem();
     items[i++] = new ExitMenuItem();
     

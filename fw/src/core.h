@@ -40,6 +40,7 @@ struct Settings {
     uint8_t sf;
     uint8_t currentDev;
     int16_t interval;
+    bool screenMirror;
 };
 
 struct Runtime {
