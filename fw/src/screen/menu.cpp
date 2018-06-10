@@ -20,7 +20,7 @@ struct DeviceSettingsMenuItem : MenuItem {
     void change() {
         settings.currentDev ++;
 
-        if (settings.currentDev >= 3) {
+        if (settings.currentDev >= lora_dev_count()) {
             settings.currentDev = 0;
         }
     }

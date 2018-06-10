@@ -19,17 +19,17 @@ void do_send(osjob_t* j);
 
 // provide application router ID (8 bytes, LSBF)
 void os_getArtEui (u1_t* buf) {
-    memcpy(buf, lora_dev[settings.currentDev].APPEUI, 8);
+    memcpy(buf, LORA_DEVS[settings.currentDev].APPEUI, 8);
 }
 
 // provide device ID (8 bytes, LSBF)
 void os_getDevEui (u1_t* buf) {
-    memcpy(buf, lora_dev[settings.currentDev].DEVEUI, 8);
+    memcpy(buf, LORA_DEVS[settings.currentDev].DEVEUI, 8);
 }
 
 // provide device key (16 bytes)
 void os_getDevKey (u1_t* buf) {
-    memcpy(buf, lora_dev[settings.currentDev].APPKEY, 16);
+    memcpy(buf, LORA_DEVS[settings.currentDev].APPKEY, 16);
 }
 
 //uint8_t mydata[] = "Hello ESP8266 world!";
@@ -224,7 +224,7 @@ void lora_reset() {
 
     // Set static session parameters. Instead of dynamically establishing a session 
     // by joining the network, precomputed session parameters are be provided.
-    LMIC_setSession (0x1, lora_dev[settings.currentDev].DEVADDR, (uint8_t*)lora_dev[settings.currentDev].NWKSKEY, (uint8_t*)lora_dev[settings.currentDev].APPSKEY);
+    LMIC_setSession (0x1, LORA_DEVS[settings.currentDev].DEVADDR, (uint8_t*)LORA_DEVS[settings.currentDev].NWKSKEY, (uint8_t*)LORA_DEVS[settings.currentDev].APPSKEY);
     //Serial.println("LMIC_setSession() finished");
 
     // LMIC_setupChannel(0, 868100000, DR_RANGE_MAP(DR_SF12, DR_SF7), BAND_CENTI);      // g-band
@@ -321,6 +321,9 @@ void lora_change_sf(uint8_t s) {
 }
 
 const char * lora_dev_name(uint8_t id) {
-    return lora_dev[id].name;
+    return LORA_DEVS[id].name;
 }
 
+uint8_t lora_dev_count() {
+    return LORA_DEVS_COUNT;
+}
