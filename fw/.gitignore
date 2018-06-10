@@ -1,5 +1,4 @@
-.pioenvs
-.piolibdeps
-.vscode/c_cpp_properties.json
-
+.pioenvs/
+.piolibdeps/
+.vscode/
 src/lora_keys.h
