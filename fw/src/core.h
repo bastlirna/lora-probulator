@@ -29,8 +29,12 @@ extern int INTERVALS[];
 
 enum PayloadType {
     PayloadEmpty = 0,
+    Payload42,
     PayloadTxt,
-    PayloadCounter
+    PayloadCounter,
+    PayloadMax,
+
+    _PayloadEnd
 };
 
 struct Settings {

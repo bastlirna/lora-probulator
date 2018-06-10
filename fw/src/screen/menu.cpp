@@ -45,17 +45,25 @@ struct PayloadSettingsMenuItem : MenuItem {
         switch (settings.payloadType) {
             case PayloadEmpty:
                 return "Empty";
+            case Payload42:
+                return "0x42";
             case PayloadTxt:
                 return "TXT";
             case PayloadCounter:
                 return "CTN";
+            case PayloadMax:
+                return "MAX";
             default:
                 return "";
         }
     }
 
     void change() {
-        int e = (int)settings.payloadType;
+        int e = ((int)settings.payloadType) + 1;
+
+        if (e == (int)_PayloadEnd) {
+            e = 0;
+        }
 
         settings.payloadType = (PayloadType)e;
     }
@@ -236,16 +244,16 @@ struct ExitMenuItem : MenuItem {
 
 // --- Menu Logic -------------------------------------------------------------
 
-MenuScreen::MenuScreen() {
-
+MenuScreen::MenuScreen()
+{
     byte i = 0;
 
     items[i++] = new DeviceSettingsMenuItem();
     items[i++] = new PeriodicSettingsMenuItem();
     items[i++] = new ConfirmSettingsMenuItem();
     items[i++] = new DownlinkSettingsMenuItem();
-    items[i++] = new SFSettingsMenuItem();
     items[i++] = new PayloadSettingsMenuItem();
+    items[i++] = new SFSettingsMenuItem();
 
     items[i++] = new ScreenMirrorMenuItem();
     items[i++] = new AboutMenuItem();

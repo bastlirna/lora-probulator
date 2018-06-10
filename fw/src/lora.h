@@ -27,4 +27,6 @@ void lora_change_sf(uint8_t s);
 const char * lora_dev_name(uint8_t id);
 uint8_t lora_dev_count();
 
+uint8_t lora_send_message();
+
 #endif

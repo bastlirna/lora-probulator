@@ -194,6 +194,14 @@ void do_send(osjob_t *j)
 
 // --- Main functions ---------------------------------------------------------
 
+//
+#define DATA_BUFFER_MAXSIZE (MAX_LEN_PAYLOAD - 1)
+
+static uint8_t data_buffer[DATA_BUFFER_MAXSIZE];
+static uint8_t data_buffer_len = 0;
+
+static uint16_t msg_counter = 0;
+
 void lora_setup()
 {
     os_init(); // LMIC OS init
@@ -261,6 +269,8 @@ void lora_reset()
     //
     ////Serial.flush();
     //Serial.println("Init done");
+
+    msg_counter = 0;
 }
 
 void saveParam(u4_t value, char *name)
@@ -331,3 +341,63 @@ uint8_t lora_dev_count()
 {
     return LORA_DEVS_COUNT;
 }
+
+static void lora_set_max_message()
+{
+    for (uint8_t i = 0; i < DATA_BUFFER_MAXSIZE; i++)
+    {
+        data_buffer[i] = i;
+    }
+    data_buffer_len = DATA_BUFFER_MAXSIZE;
+}
+
+
+uint8_t lora_send_message()
+{
+    // Check if there is not a current TX/RX job running
+    if (LMIC.opmode & (1 << 7))
+    {
+        return 1;
+    }
+
+    LMIC.upRepeat = 1;
+    msg_counter ++;
+
+    switch(settings.payloadType)
+    {
+        case (PayloadEmpty):
+            data_buffer[0] = 0;
+            data_buffer_len = 0;
+            break;
+
+        case (Payload42):
+            data_buffer[0] = 0x42;
+            data_buffer_len = 1;
+            break;
+
+        case (PayloadTxt):
+            strcpy((char *)data_buffer, "Lorem Ipsum");
+            data_buffer_len = strlen((char *)data_buffer);
+            break;
+
+        case (PayloadCounter):
+            data_buffer[0] = (uint8_t) (msg_counter);
+            data_buffer[1] = (uint8_t) (msg_counter >> 8);
+            data_buffer_len = 2;
+            break;
+
+        case (PayloadMax):
+            lora_set_max_message();
+            break;
+
+        default:
+            return 2;
+    }
+
+    // Prepare upstream data transmission at the next possible time.
+    LMIC_setTxData2(settings.donwlink ? 2 : 1, data_buffer, data_buffer_len, settings.confirm ? 1 : 0);
+
+    return 0;
+}
+
+

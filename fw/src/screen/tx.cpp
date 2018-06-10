@@ -6,10 +6,8 @@
 #include "core.h"
 #include "lora.h"
 
-uint8_t mydata[] = "X";
-
 void TxScreen::enter() {
-    
+
 
     lcd_txs();
 /*
@@ -38,24 +36,13 @@ void TxScreen::enter() {
 
     display.display();
 
-        // Check if there is not a current TX/RX job running
-    if (LMIC.opmode & (1 << 7)) 
-    {
+
+    uint8_t s = lora_send_message();
+    if (s != 0) {
+        // TODO handle error code
         msg.message = "OP_TXRXPEND, not sending";
-        //Serial.println("OP_TXRXPEND, not sending");
-
         screenMgr.change(&msg);
-    } 
-    else 
-    {
-        //Serial.println("ok");
-
-        LMIC.upRepeat = 1;
-
-        // Prepare upstream data transmission at the next possible time.
-        LMIC_setTxData2(settings.donwlink ? 2 : 1, mydata, sizeof(mydata)-1, settings.confirm ? 1 : 0);
     }
-
 }
 
 void TxScreen::leave() {
@@ -66,7 +53,7 @@ void TxScreen::loop() {
 }
 
 void TxScreen::onAPress() {
-    
+
     if (runtime.periodic) {
         runtime.periodicStop();
     }
