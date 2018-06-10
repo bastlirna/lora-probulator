@@ -8,7 +8,7 @@
 // --- Menu Items -------------------------------------------------------------
 
 struct DeviceSettingsMenuItem : MenuItem {
-    
+
     const char * label() {
         return "Device";
     }
@@ -56,7 +56,7 @@ struct PayloadSettingsMenuItem : MenuItem {
 
     void change() {
         int e = (int)settings.payloadType;
-        
+
         settings.payloadType = (PayloadType)e;
     }
 
@@ -92,15 +92,15 @@ struct ConfirmSettingsMenuItem : MenuItem {
 };
 
 struct DownlinkSettingsMenuItem : MenuItem {
-    
+
         const char * label() {
             return "Downlink";
         }
-    
+
         String value() {
             return settings.donwlink ? "YES" : "NO";
         }
-    
+
         void change() {
             settings.donwlink = !settings.donwlink;
         }
@@ -108,7 +108,7 @@ struct DownlinkSettingsMenuItem : MenuItem {
         void reset() {
             settings.donwlink = false;
         }
-    
+
         void apply() {
             runtime.periodicReset();
         }
@@ -122,7 +122,7 @@ struct PeriodicSettingsMenuItem : MenuItem {
 
     String value() {
 
-        if (settings.interval == -1) {
+        if (settings.interval == INTERVALS_OFF) {
             return "OFF";
         }
 
@@ -131,15 +131,15 @@ struct PeriodicSettingsMenuItem : MenuItem {
 
     void change() {
         settings.interval ++;
-        if (settings.interval >= INTERVALS_LEN) settings.interval = -1;
+        if (settings.interval >= INTERVALS_LEN) settings.interval = INTERVALS_OFF;
     }
 
     void reset() {
-        settings.interval = -1;
+        settings.interval = INTERVALS_OFF;
     }
 
     void apply() {
-        if (settings.interval == -1) {
+        if (settings.interval == INTERVALS_OFF) {
             runtime.periodic = false;
         } else {
             runtime.periodic = true;
@@ -246,11 +246,11 @@ MenuScreen::MenuScreen() {
     items[i++] = new DownlinkSettingsMenuItem();
     items[i++] = new SFSettingsMenuItem();
     items[i++] = new PayloadSettingsMenuItem();
-    
+
     items[i++] = new ScreenMirrorMenuItem();
     items[i++] = new AboutMenuItem();
     items[i++] = new ExitMenuItem();
-    
+
     len = i;
 }
 
@@ -265,12 +265,12 @@ void MenuScreen::leave() {
         items[current]->apply();
     }
 
-    
+
 }
 
 void MenuScreen::update() {
     lcd_menu();
-    
+
     int start = 0;
 
     if (current >= 3) {
@@ -278,7 +278,7 @@ void MenuScreen::update() {
     }
 
     for(int i = start; i < len && i < start + 4; i++) {
-        
+
         lcd_menu_item(i-start, items[i]->label(), items[i]->value(), i == current);
     }
 

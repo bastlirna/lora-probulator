@@ -25,6 +25,7 @@ extern Screen* currentScree;
 extern int INTERVALS[];
 
 #define INTERVALS_LEN 6
+#define INTERVALS_OFF -1
 
 enum PayloadType {
     PayloadEmpty = 0,

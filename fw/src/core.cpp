@@ -28,17 +28,16 @@ RTC_DATA_ATTR Runtime runtime = {
 void core_setup() {
 
     // initialization after reset
-    if (settings.saved == false) { 
-        
+    if (settings.saved == false) {
+
         settings.saved = true;
 
         settings.confirm = true;
         settings.donwlink = false;
         settings.sf = 7;
         settings.currentDev = 0;
-        settings.interval = 1;
+        settings.interval = INTERVALS_OFF;
 
-        
         runtime.periodic = false;
         runtime.periodicRunning = false;
         runtime.send = false;
@@ -80,7 +79,7 @@ void Runtime::periodicReset() {
 
 void Runtime::incrementStats(bool success) {
     counter ++;
-    
+
     if (success) {
         successCounter ++;
     }
