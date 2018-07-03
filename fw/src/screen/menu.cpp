@@ -35,6 +35,46 @@ struct DeviceSettingsMenuItem : MenuItem {
     }
 };
 
+struct ModeSettingsMenuItem : MenuItem {
+
+    const char * label() {
+        return "Mode";
+    }
+
+    String value() {
+        switch (settings.mode) {
+            case ModeUpOnly:
+                return "Uplink Only";
+            case ModeConfirmend:
+                return "Confirm";
+            case ModeMonitor:
+                return "Monitoring";
+            default:
+                return "";
+        }
+    }
+
+    void change() {
+        int e = ((int)settings.mode) + 1;
+
+        if (e == (int)_ModeTypeEnd) {
+            e = 0;
+        }
+
+        settings.mode = (ModeType)e;
+    }
+
+    void reset() {
+        settings.mode = ModeUpOnly;
+    }
+
+    void apply() {
+    }
+};
+
+
+
+
 struct PayloadSettingsMenuItem : MenuItem {
 
     const char * label() {
@@ -73,6 +113,10 @@ struct PayloadSettingsMenuItem : MenuItem {
     }
 
     void apply() {
+    }
+
+    bool isEnabled() {
+        return settings.mode != ModeMonitor;
     }
 };
 
@@ -249,6 +293,7 @@ MenuScreen::MenuScreen()
     byte i = 0;
 
     items[i++] = new DeviceSettingsMenuItem();
+    items[i++] = new ModeSettingsMenuItem();
     items[i++] = new PeriodicSettingsMenuItem();
     items[i++] = new ConfirmSettingsMenuItem();
     items[i++] = new DownlinkSettingsMenuItem();
@@ -272,8 +317,6 @@ void MenuScreen::leave() {
     if (itemChanged) {
         items[current]->apply();
     }
-
-
 }
 
 void MenuScreen::update() {
@@ -287,7 +330,7 @@ void MenuScreen::update() {
 
     for(int i = start; i < len && i < start + 4; i++) {
 
-        lcd_menu_item(i-start, items[i]->label(), items[i]->value(), i == current);
+        lcd_menu_item(i-start, items[i]->label(), items[i]->isEnabled() ? items[i]->value() : "-", i == current);
     }
 
     lcd_update();
@@ -319,15 +362,19 @@ void MenuScreen::onALongPress() {
 
 // CHange value
 void MenuScreen::onBPress() {
-    items[current]->change();
-    itemChanged = true;
+    if (items[current]->isEnabled()) {
+        items[current]->change();
+        itemChanged = true;
+    }
     update();
 }
 
 // CHange value
 void MenuScreen::onBLongPress() {
-    items[current]->reset();
-    itemChanged = true;
+    if (items[current]->isEnabled()) {
+        items[current]->reset();
+        itemChanged = true;
+    }
     update();
 }
 

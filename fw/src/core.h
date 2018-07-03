@@ -37,11 +37,20 @@ enum PayloadType {
     _PayloadEnd
 };
 
+enum ModeType {
+    ModeUpOnly = 0,
+    ModeConfirmend,
+    ModeMonitor,
+
+    _ModeTypeEnd
+};
+
 struct Settings {
     bool saved;
     bool confirm;
     bool donwlink;
     PayloadType payloadType;
+    ModeType mode;
     uint8_t sf;
     uint8_t currentDev;
     int16_t interval;

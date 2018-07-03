@@ -5,15 +5,13 @@
 
 #include "imgs/icons.h"
 
-#define ICON(name) name##_width, name##_height, name##_bits 
-
 Display display(0x3c, 21, 22);
 
 
 
 void lcd_setup() {
     display.init();
-    
+
     display.flipScreenVertically();
     display.setFont(ArialMT_Plain_10);
 }
@@ -35,7 +33,7 @@ void lcd_home() {
 
     lcd_menu_bar("MENU", action);
 
-    // device 
+    // device
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.drawString(0, 0, lora_dev_name(settings.currentDev));
 
@@ -53,10 +51,10 @@ void lcd_home() {
     } else {
         display.drawXbm(next_icon, 1, ICON(uplink));
     }
-    
+
     // interval
     if (runtime.periodic) {
-        display.setTextAlignment(TEXT_ALIGN_CENTER);    
+        display.setTextAlignment(TEXT_ALIGN_CENTER);
         display.drawString(0, 64, String(INTERVALS[settings.interval]) + "s");
     }
 
@@ -64,7 +62,7 @@ void lcd_home() {
 
     if (runtime.periodic) {
 
-        const int top = 37;            
+        const int top = 37;
         const int len = 92;
 
         if (runtime.periodicRunning) {
@@ -85,13 +83,13 @@ void lcd_home() {
             if (runtime.counter == 0) {
                 display.setTextAlignment(TEXT_ALIGN_LEFT);
                 display.drawString(1, 19, "Stats:");
-                
+
                 display.setTextAlignment(TEXT_ALIGN_RIGHT);
                 display.drawString(126, 19, "-");
             } else {
                 display.setTextAlignment(TEXT_ALIGN_LEFT);
                 display.drawString(1, 19, "Stats:");
-            
+
                 display.setTextAlignment(TEXT_ALIGN_RIGHT);
                 display.drawString(126, 19, String(runtime.successCounter) + "/" + String(runtime.counter) + " (" + String(runtime.successRate) + " %)");
             }
@@ -99,17 +97,17 @@ void lcd_home() {
         } else {
             display.setTextAlignment(TEXT_ALIGN_LEFT);
             display.drawString(1, 19, "Counter:");
-            
+
             display.setTextAlignment(TEXT_ALIGN_RIGHT);
             display.drawString(126, 19, String(runtime.counter));
         }
-        
+
     } else {
 
         display.setTextAlignment(TEXT_ALIGN_CENTER_BOTH);
         display.drawString(64, 32, "Ready");
     }
-     
+
     display.display();
 }
 
@@ -136,7 +134,7 @@ void lcd_update() {
 void lcd_menu_bar(const char* a, const char* b) {
     display.drawHorizontalLine(0, 52, 128);
     //display.drawVerticalLine(64, 54, 10);
-    
+
     display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.drawString(0, 52, a);
 
@@ -149,7 +147,7 @@ void lcd_menu_item(unsigned int pos, const char * label, String value, bool sele
     display.setTextAlignment(TEXT_ALIGN_LEFT);
 
     if (selected) {
-        display.drawString(0, pos * 12, ">");    
+        display.drawString(0, pos * 12, ">");
     }
 
     display.drawString(12, pos * 12, label);
@@ -169,11 +167,71 @@ void lcd_sleep() {
 
 void lcd_txs() {
     display.clear();
-    
-    display.setTextAlignment(TEXT_ALIGN_CENTER);
-    display.drawString(64, 0, "Sending...");
-    
+
+    // display.setTextAlignment(TEXT_ALIGN_CENTER);
+    // display.drawString(64, 0, "Sending...");
+
     lcd_menu_bar("STORNO", "");
 
-    display.display();
+   // display.display();
 }
+
+
+
+void Animation::setFrames(char** frames, uint8_t count)
+{
+    this->frames = frames;
+    this->count = count;
+}
+
+void Animation::setInterval(uint16_t ms)
+{
+    this->interval = ms;
+}
+
+void Animation::loop()
+{
+    if (this->enabled == false)
+    {
+        return;
+    }
+
+    if (millis() - this->last > this->interval)
+    {
+        Serial.println("Frame");
+
+        this->last = millis();
+        this->current ++;
+
+        if (this->current >= this->count) {
+            this->current = 0;
+        }
+
+        Serial.println(current, DEC);
+
+        this->disp->setColor(BLACK);
+        this->disp->fillRect(_x, _y, _w, _h);
+        this->disp->setColor(WHITE);
+
+        this->disp->drawXbm(_x, _y, _w, _h, this->frames[current]);
+
+        this->disp->display();
+    }
+}
+
+void Animation::play()
+{
+    this->enabled = true;
+    this->current = 0;
+}
+
+void Animation::stop()
+{
+    this->enabled = false;
+}
+
+void Animation::clear()
+{
+
+}
+

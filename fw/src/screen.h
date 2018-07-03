@@ -5,7 +5,7 @@ class Screen {
 
 public:
     Screen() {};
-  
+
     virtual void loop();
     virtual void enter();
     virtual void leave();
@@ -32,7 +32,6 @@ public:
     mutable Screen* _nextScreen;
 
 protected:
-    
 
 };
 

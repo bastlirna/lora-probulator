@@ -72,7 +72,7 @@ static void on_txcomplete()
         screenMgr.change(&home);
     }
 
-    /*
+
     if (LMIC.txrxFlags & TXRX_ACK) {
 
       //Serial.println(F("Received ack"));
@@ -91,16 +91,16 @@ static void on_txcomplete()
     }
 
     if (LMIC.dataLen) {
-      // data received in rx slot after tx
-      //Serial.print(F("Received "));
-      //Serial.print(LMIC.dataLen);
-      //Serial.print(F(" bytes of payload: 0x"));
+        // data received in rx slot after tx
+        Serial.print(F("Received "));
+        Serial.print(LMIC.dataLen);
+        Serial.print(F(" bytes of payload: 0x"));
     }
     else
     {
-     //Serial.print(F("No data received "));
+        Serial.print(F("No data received "));
     }
-    */
+
 
     // Schedule next transmission
     //mydata[0] = 170 + os_getRndU1() % 80;
@@ -201,6 +201,9 @@ static uint8_t data_buffer[DATA_BUFFER_MAXSIZE];
 static uint8_t data_buffer_len = 0;
 
 static uint16_t msg_counter = 0;
+
+static uint8_t msg_port = 1;
+static bool msg_confirm = false;
 
 void lora_setup()
 {
@@ -363,6 +366,8 @@ uint8_t lora_send_message()
     LMIC.upRepeat = 1;
     msg_counter ++;
 
+    msg_port = 1;
+
     switch(settings.payloadType)
     {
         case (PayloadEmpty):
@@ -395,7 +400,7 @@ uint8_t lora_send_message()
     }
 
     // Prepare upstream data transmission at the next possible time.
-    LMIC_setTxData2(settings.donwlink ? 2 : 1, data_buffer, data_buffer_len, settings.confirm ? 1 : 0);
+    LMIC_setTxData2(msg_port, data_buffer, data_buffer_len, settings.confirm ? 1 : 0);
 
     return 0;
 }

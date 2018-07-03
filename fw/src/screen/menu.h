@@ -10,6 +10,7 @@ struct MenuItem {
     virtual void change();
     virtual void reset();
     virtual void apply();
+    virtual bool isEnabled() { return true; }
 };
 
 class MenuScreen : public Screen {
@@ -20,7 +21,7 @@ public:
 
     void enter();
     void leave();
-    void loop();    
+    void loop();
 
     virtual void onAPress();
     virtual void onALongPress();

@@ -32,6 +32,7 @@ void core_setup() {
 
         settings.saved = true;
 
+        settings.mode = ModeUpOnly;
         settings.confirm = true;
         settings.donwlink = false;
         settings.sf = 7;
