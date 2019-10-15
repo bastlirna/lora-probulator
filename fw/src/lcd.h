@@ -2,7 +2,7 @@
 #define _lcd_h_
 
 #include "SSD1306.h"
-#include "Display.h"
+#include "display.h"
 
 #define ICON(name) name##_width, name##_height, name##_bits
 
