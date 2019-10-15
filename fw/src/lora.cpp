@@ -265,9 +265,9 @@ void lora_reset()
     LMIC.dn2Dr = DR_SF9;
 
     // Set data rate and transmit power (note: txpow seems to be ignored by the library)
-    LMIC_setDrTxpow(DR_SF7, 14);
+    //LMIC_setDrTxpow(DR_SF7, 14);
 
-    //lora_change_sf(sf);
+    lora_change_sf(settings.sf);
 
     //
     ////Serial.flush();
@@ -308,29 +308,29 @@ void lora_change_sf(uint8_t s)
     {
     case 7:
         //Serial.println("7");
-        LMIC_setDrTxpow(SF7, 14);
+        LMIC_setDrTxpow(DR_SF7, 14);
         return;
     case 8:
         //Serial.println("8");
-        LMIC_setDrTxpow(SF8, 14);
+        LMIC_setDrTxpow(DR_SF8, 14);
         return;
     case 9:
         //Serial.println("9");
-        LMIC_setDrTxpow(SF9, 14);
+        LMIC_setDrTxpow(DR_SF9, 14);
         return;
     case 10:
         //Serial.println("10");
-        LMIC_setDrTxpow(SF10, 14);
+        LMIC_setDrTxpow(DR_SF10, 14);
         return;
     case 11:
         //Serial.println("11");
-        LMIC_setDrTxpow(SF11, 14);
+        LMIC_setDrTxpow(DR_SF11, 14);
         return;
     case 12:
         //Serial.println("12");
-        LMIC_setDrTxpow(SF12, 14);
+        LMIC_setDrTxpow(DR_SF12, 14);
         return;
-    defualt:
+    default:
         Serial.println("UNKNOWN SF");
     }
 }
