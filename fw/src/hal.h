@@ -1,7 +1,7 @@
 #ifndef _HAL_H_
 #define _HAL_H_
 
-#include <Button.h>
+#include <button.h>
 #include <Bounce2.h>
 
 // pin deffinition

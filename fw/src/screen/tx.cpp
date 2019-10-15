@@ -10,7 +10,7 @@
 
 Animation an(&display, (128 - waits_0_width) / 2, 20, waits_0_width, waits_0_height);
 
-char* wf[3] = { waits_1_bits, waits_2_bits, waits_3_bits };
+uint8_t* wf[3] = { waits_1_bits, waits_2_bits, waits_3_bits };
 
 
 /*
