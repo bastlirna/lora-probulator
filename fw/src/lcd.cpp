@@ -178,7 +178,7 @@ void lcd_txs() {
 
 
 
-void Animation::setFrames(char** frames, uint8_t count)
+void Animation::setFrames(uint8_t** frames, uint8_t count)
 {
     this->frames = frames;
     this->count = count;

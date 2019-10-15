@@ -33,7 +33,7 @@ public:
     {
     }
 
-    void setFrames(char** frames, uint8_t count);
+    void setFrames(uint8_t** frames, uint8_t count);
     void setInterval(uint16_t ms);
 
     void loop();
@@ -47,7 +47,7 @@ private:
     uint16_t _y;
     uint16_t _w;
     uint16_t _h;
-    char** frames;
+    uint8_t** frames;
     uint8_t count;
     uint16_t interval;
 
